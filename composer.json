@@ -1,0 +1,20 @@
+{
+    "name": "tolstoydotcom/spritz",
+    "description": "Spritz state machine",
+    "autoload": {
+        "psr-4": {
+            "dev\\wisdomtree\\spritz\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "TolstoyDotCom",
+            "email": "sampro_domains@yahoo.com"
+        }
+    ],
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
