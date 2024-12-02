@@ -1,8 +1,8 @@
 === Spritz ===
-Contributors: wisdomtreedev
+Contributors: tolstoydotcom / Chris Kelly
 Tags: workflow, management, editorial, admin, collaboration
 Requires at least: 6.6
-Tested up to: 6.6
+Tested up to: 6.7
 Stable tag: 1.0.0
 Requires PHP: 8.3
 License: Apache-2.0

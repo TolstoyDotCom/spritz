@@ -90,6 +90,13 @@ class SettingsController implements ISettingsController {
 
 	public function settingsPage() : void {
 		$emailHelp = __('In the email subject and/or body, you can use "[numberOfChanges]" to insert the number of Spritzen that were changed.', 'spritz');
+		$linksHelp = __('Links:', 'spritz');
+
+		$link1url = 'https://wisdomtree.dev/spritz-wordpress-plugin';
+		$link1text = __('Spritz plugin homepage.', 'spritz');
+
+		$link2url = 'https://www.paypal.com/donate/?hosted_button_id=4U3VYC5LNWRM4';
+		$link2text = __('Help fund Spritz plugin development.', 'spritz');
 
 		$path = $this->directories->getTemplatePath( 'settings_page' );
 		if ( $path ) {

@@ -2,9 +2,12 @@
 /*
 Plugin Name: Spritz
 Description: A WordPress plugin for posts that need to be reviewed on a regular basis. This plugin adds basic workflow states to posts.
-Version: 1.0
-Author: Chris Kelly
+Version: 1.0.0
+Author: tolstoydotcom / Chris Kelly
+Author URI: https://wisdomtree.dev/
 Text Domain: spritz
+Requires PHP: 8.3
+License: Apache-2.0
 */
 
 use dev\wisdomtree\spritz\wordpress\App;
