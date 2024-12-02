@@ -3,7 +3,7 @@ Contributors: tolstoydotcom / Chris Kelly
 Tags: workflow, management, editorial, admin, collaboration
 Requires at least: 6.6
 Tested up to: 6.7
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 Requires PHP: 8.3
 License: Apache-2.0
 License URI: https://www.apache.org/licenses/LICENSE-2.0
