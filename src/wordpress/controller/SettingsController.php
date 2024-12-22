@@ -23,6 +23,7 @@ use dev\wisdomtree\spritz\wordpress\entity\SettingsEntity;
 
 class SettingsController implements ISettingsController {
 	private const POST_META_KEY = 'spritz_postmeta';
+	private const SETTINGS_OPTIONS_GROUP = 'spritz_options_group';
 	private const SETTINGS_KEY_APPROVALS = 'spritz_setting_automatic_approvals';
 	private const SETTINGS_KEY_DAYS_BEFORE = 'spritz_setting_days_before_review';
 	private const SETTINGS_KEY_NOTIFICATION_EMAIL_ADDRESS = 'spritz_setting_notification_email_address';
@@ -72,11 +73,11 @@ class SettingsController implements ISettingsController {
 	}
 
 	public function deleteSettings() : void {
-		delete_option( 'spritz_options_group', self::SETTINGS_KEY_APPROVALS );
-		delete_option( 'spritz_options_group', self::SETTINGS_KEY_DAYS_BEFORE );
-		delete_option( 'spritz_options_group', self::SETTINGS_KEY_NOTIFICATION_EMAIL_ADDRESS );
-		delete_option( 'spritz_options_group', self::SETTINGS_KEY_NOTIFICATION_EMAIL_SUBJECT );
-		delete_option( 'spritz_options_group', self::SETTINGS_KEY_NOTIFICATION_EMAIL_BODY );
+		delete_option( self::SETTINGS_OPTIONS_GROUP, self::SETTINGS_KEY_APPROVALS );
+		delete_option( self::SETTINGS_OPTIONS_GROUP, self::SETTINGS_KEY_DAYS_BEFORE );
+		delete_option( self::SETTINGS_OPTIONS_GROUP, self::SETTINGS_KEY_NOTIFICATION_EMAIL_ADDRESS );
+		delete_option( self::SETTINGS_OPTIONS_GROUP, self::SETTINGS_KEY_NOTIFICATION_EMAIL_SUBJECT );
+		delete_option( self::SETTINGS_OPTIONS_GROUP, self::SETTINGS_KEY_NOTIFICATION_EMAIL_BODY );
 	}
 
 	public function registerHooks() : void {
@@ -98,6 +99,8 @@ class SettingsController implements ISettingsController {
 		$link2url = 'https://www.paypal.com/donate/?hosted_button_id=4U3VYC5LNWRM4';
 		$link2text = __('Help fund Spritz plugin development.', 'spritz');
 
+		$optionsGroup = self::SETTINGS_OPTIONS_GROUP;
+
 		$path = $this->directories->getTemplatePath( 'settings_page' );
 		if ( $path ) {
 			include( $path );
@@ -105,11 +108,31 @@ class SettingsController implements ISettingsController {
 	}
 
 	public function registerSettingsPage() : void {
-		register_setting( 'spritz_options_group', self::SETTINGS_KEY_APPROVALS );
-		register_setting( 'spritz_options_group', self::SETTINGS_KEY_DAYS_BEFORE );
-		register_setting( 'spritz_options_group', self::SETTINGS_KEY_NOTIFICATION_EMAIL_ADDRESS );
-		register_setting( 'spritz_options_group', self::SETTINGS_KEY_NOTIFICATION_EMAIL_SUBJECT );
-		register_setting( 'spritz_options_group', self::SETTINGS_KEY_NOTIFICATION_EMAIL_BODY );
+		register_setting( self::SETTINGS_OPTIONS_GROUP, self::SETTINGS_KEY_APPROVALS, [
+			'type' => 'boolean',
+			'sanitize_callback' => [$this, 'sanitizeBoolean'],
+		]);
+
+		register_setting( self::SETTINGS_OPTIONS_GROUP, self::SETTINGS_KEY_DAYS_BEFORE, [
+			'type' => 'integer',
+			'sanitize_callback' => [$this, 'sanitizeInt'],
+		]);
+
+		register_setting( self::SETTINGS_OPTIONS_GROUP, self::SETTINGS_KEY_NOTIFICATION_EMAIL_ADDRESS, [
+			'type' => 'string',
+			'sanitize_callback' => 'sanitize_text_field'
+		]);
+
+		register_setting( self::SETTINGS_OPTIONS_GROUP, self::SETTINGS_KEY_NOTIFICATION_EMAIL_SUBJECT, [
+			'type' => 'string',
+			'sanitize_callback' => 'sanitize_text_field'
+		]);
+
+		register_setting( self::SETTINGS_OPTIONS_GROUP, self::SETTINGS_KEY_NOTIFICATION_EMAIL_BODY, [
+			'type' => 'string',
+			'sanitize_callback' => 'sanitize_text_field'
+		]);
+
 		add_settings_section( 'spritz_section', __('Spritz Settings', 'spritz'), [ $this, 'settingsSectionCallback' ], 'spritz' );
 		add_settings_field( self::SETTINGS_KEY_APPROVALS, __('Automatically approve posts', 'spritz'), [ $this, 'settingsFieldApprovalsCallback' ], 'spritz', 'spritz_section' );
 		add_settings_field( self::SETTINGS_KEY_DAYS_BEFORE, __('Number of days before a post is reviewed', 'spritz'), [ $this, 'settingsFieldDaysBeforeCallback' ], 'spritz', 'spritz_section' );
@@ -175,5 +198,13 @@ class SettingsController implements ISettingsController {
 		if ( $path ) {
 			include( $path );
 		}
+	}
+
+	public function sanitizeBoolean( $val ) : bool {
+		return $val ? TRUE : FALSE;
+	}
+
+	public function sanitizeInt( $val ) : bool {
+		return (int) $val;
 	}
 }

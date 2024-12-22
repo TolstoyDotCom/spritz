@@ -23,12 +23,21 @@ if ( !class_exists( 'WP_List_Table' ) ) {
 use dev\wisdomtree\spritz\api\installation\IDirectories;
 use dev\wisdomtree\spritz\api\controller\ISpritzController;
 use dev\wisdomtree\spritz\api\controller\ISettingsController;
+use dev\wisdomtree\spritz\api\utils\IUtils;
 use WP_List_Table;
 
 class SpritzTableBase extends WP_List_Table {
+	private const SORT_DATA_POSSIBLE_INPUTS = [
+		'orderby',
+		'order',
+		'page',
+		'entity_id',
+	];
+
 	public function __construct( protected readonly IDirectories $directories,
 									protected readonly ISpritzController $spritzController,
-									protected readonly ISettingsController $settingsController ) {
+									protected readonly ISettingsController $settingsController,
+									protected readonly IUtils $utils ) {
 		parent::__construct();
 	}
 
@@ -143,7 +152,7 @@ class SpritzTableBase extends WP_List_Table {
 	}
 
 	protected function getRequestData() {
-		$input = stripslashes_deep( $_REQUEST );
+		$input = $this->utils->stripSlashesScalarKeys( $_REQUEST, self::SORT_DATA_POSSIBLE_INPUTS );
 
 		$ret = [
 			'column' => 'id',

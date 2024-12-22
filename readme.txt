@@ -1,5 +1,5 @@
 === Spritz ===
-Contributors: tolstoydotcom / Chris Kelly
+Contributors: tolstoydotcom
 Tags: workflow, management, editorial, admin, collaboration
 Requires at least: 6.6
 Tested up to: 6.7

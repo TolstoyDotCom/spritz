@@ -1,4 +1,10 @@
-<?php echo wp_kses( $nonceField, [ 'input' => [ 'id' => [], 'type' => [], 'name' => [], 'value' => [] ] ] ); ?>
+<?php
+
+if ( !defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+?><?php echo wp_kses( $nonceField, [ 'input' => [ 'id' => [], 'type' => [], 'name' => [], 'value' => [] ] ] ); ?>
 <p>
 	<?php if ( $message ) { ?>
 		<div class="spritz_message"><?php echo esc_html( $message ); ?></div>

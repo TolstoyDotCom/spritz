@@ -3,7 +3,7 @@
 Plugin Name: Spritz
 Description: A WordPress plugin for posts that need to be reviewed on a regular basis. This plugin adds basic workflow states to posts.
 Version: 1.0.1
-Author: tolstoydotcom / Chris Kelly
+Author: tolstoydotcom
 Author URI: https://wisdomtree.dev/
 Text Domain: spritz
 Requires PHP: 8.3
@@ -17,6 +17,7 @@ use dev\wisdomtree\spritz\wordpress\controller\SpritzController;
 use dev\wisdomtree\spritz\wordpress\controller\SettingsController;
 use dev\wisdomtree\spritz\wordpress\entity\SpritzEntity;
 use dev\wisdomtree\spritz\wordpress\entity\SpritzState;
+use dev\wisdomtree\spritz\wordpress\utils\Utils;
 
 if ( !defined( 'ABSPATH' ) ) {
 	exit;
@@ -32,10 +33,11 @@ class SpritzStarter {
 	public function run() {
 		global $wpdb;
 
+		$utils = new Utils( __DIR__ );
 		$directories = new Directories( __DIR__ );
 		$spritzController = new SpritzController( $wpdb, $wpdb->prefix, $wpdb->get_charset_collate() );
 		$settingsController = new SettingsController( $directories, $wpdb, $wpdb->prefix, $wpdb->get_charset_collate() );
-		$app = new App( $directories, $spritzController, $settingsController );
+		$app = new App( $directories, $spritzController, $settingsController, $utils );
 
 		$spritzController->registerHooks();
 		$settingsController->registerHooks();

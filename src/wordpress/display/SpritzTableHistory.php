@@ -19,12 +19,14 @@ namespace dev\wisdomtree\spritz\wordpress\display;
 use dev\wisdomtree\spritz\api\installation\IDirectories;
 use dev\wisdomtree\spritz\api\controller\ISpritzController;
 use dev\wisdomtree\spritz\api\controller\ISettingsController;
+use dev\wisdomtree\spritz\api\utils\IUtils;
 
 class SpritzTableHistory extends SpritzTableBase {
 	public function __construct( IDirectories $directories,
 									ISpritzController $spritzController,
-									ISettingsController $settingsController ) {
-		parent::__construct( $directories, $spritzController, $settingsController );
+									ISettingsController $settingsController,
+									IUtils $utils ) {
+		parent::__construct( $directories, $spritzController, $settingsController, $utils );
 	}
 
 	/**

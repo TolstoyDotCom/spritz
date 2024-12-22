@@ -1,1 +1,7 @@
-<textarea rows="8" cols="80" name="<?php echo esc_attr( $name ); ?>"><?php echo esc_textarea( $setting ); ?></textarea>
+<?php
+
+if ( !defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+?><textarea rows="8" cols="80" name="<?php echo esc_attr( $name ); ?>"><?php echo esc_textarea( $setting ); ?></textarea>

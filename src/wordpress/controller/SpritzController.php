@@ -122,7 +122,7 @@ class SpritzController implements ISpritzController {
 				$count++;
 			}
 			catch ( Exception $e ) {
-				rawdebug( 'EXCEPTION in ' . __METHOD__ . '=' . $e->getMessage() . ' from ' . json_encode( $item ) );
+				rawdebug( 'EXCEPTION in ' . __METHOD__ . '=' . $e->getMessage() . ' from ' . wp_json_encode( $item ) );
 			}
 		}
 

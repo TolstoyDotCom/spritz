@@ -22,6 +22,7 @@ use dev\wisdomtree\spritz\api\controller\ISpritzController;
 use dev\wisdomtree\spritz\api\controller\ISettingsController;
 use dev\wisdomtree\spritz\api\entity\ISpritzEntity;
 use dev\wisdomtree\spritz\api\entity\SpritzState;
+use dev\wisdomtree\spritz\api\utils\IUtils;
 use dev\wisdomtree\spritz\wordpress\installation\Schema;
 use dev\wisdomtree\spritz\wordpress\display\SpritzTableListing;
 use dev\wisdomtree\spritz\wordpress\display\SpritzTableHistory;
@@ -29,10 +30,22 @@ use dev\wisdomtree\spritz\wordpress\display\SpritzTableHistory;
 class App {
 	private const POST_STATE_MESSAGES = 'POST_STATE_MESSAGES';
 	private const SECONDS_PER_DAY = 24 * 60 * 60;
+	private const META_BOX_SAVE_POSSIBLE_INPUTS = [
+		'spritz_post_sidebar_nonce',
+		'spritz_override_post_settings',
+		'spritz_confirm_override',
+		'spritz_num_days',
+		'spritz_auto_approve',
+		'spritz_confirm_transition',
+		'spritz_public_note',
+		'spritz_private_note',
+		'spritz_transition',
+	];
 
 	public function __construct( private readonly IDirectories $directories,
 									private readonly ISpritzController $spritzController,
-									private readonly ISettingsController $settingsController ) {
+									private readonly ISettingsController $settingsController,
+									private readonly IUtils $utils ) {
 	}
 
 	public function registerAdminPages() : void {
@@ -61,13 +74,13 @@ class App {
 	}
 
 	public function showSpritzListingPage() : void {
-		$table = new SpritzTableListing( $this->directories, $this->spritzController, $this->settingsController );
+		$table = new SpritzTableListing( $this->directories, $this->spritzController, $this->settingsController, $this->utils );
 		$table->prepare_items();
 		$table->display();
 	}
 
 	public function showSpritzHistoryPage() : void {
-		$table = new SpritzTableHistory( $this->directories, $this->spritzController, $this->settingsController );
+		$table = new SpritzTableHistory( $this->directories, $this->spritzController, $this->settingsController, $this->utils );
 		$table->prepare_items();
 		$table->display();
 	}
@@ -123,8 +136,14 @@ class App {
 		$spritzEntity = $this->spritzController->loadLatestByEntityId( $post->ID );
 
 		$transition_label = __('Choose the new state for this post.', 'spritz');
+
+		/* translators: The placeholder is a state name. */
 		$current_state_explanation = sprintf( __('Current state: %s', 'spritz'), $spritzEntity->getCurrentState()->name );
+
+		/* translators: The placeholder is a user-supplied note. */
 		$current_state_public_note = sprintf( __('Note: %s', 'spritz'), $spritzEntity->getPublicNote() );
+
+		/* translators: The placeholder is a local date. */
 		$current_state_next_action_date = sprintf( __('Next action date: %s', 'spritz'), date( get_option( 'date_format' ), $spritzEntity->getNextReviewDate() ) );
 
 		$public_note_label = __('A public note, shown to everyone.', 'spritz');
@@ -140,7 +159,10 @@ class App {
 		$admin_panel_title = __('Override settings for this post.', 'spritz');
 		$num_days_label = __('Number of days before review.', 'spritz');
 		$show_admin_panel = current_user_can( 'spritz_override_post_settings' );
+
+		/* translators: The placeholder is yes or no. */
 		$auto_approve_text = sprintf( __('Auto-approve (default: %s).', 'spritz'), $settingsEntity->getAutomaticApprovals() ? __('yes', 'spritz') : __('no', 'spritz') );
+
 		$spritz_num_days = $settingsEntity->getDaysBeforeReview();
 		$confirm_override = __('Click here to confirm the change.', 'spritz');
 
@@ -157,7 +179,10 @@ class App {
 				}
 
 				$key = $this->transitionToPermission( $fromState, $toState );
+
+				/* translators: Both placeholders are spritz states. */
 				$val = sprintf( __('Spritz: transition posts from the \'%1$s\' state to the \'%2$s\' state', 'spritz'), $fromState->value, $toState->value );
+
 				$ret[ $key ] = $val;
 			}
 		}
@@ -250,7 +275,7 @@ class App {
 	}
 
 	public function metaBoxSavePost( $postId, $post ) : int {
-		$input = stripslashes_deep( $_POST );
+		$input = $this->utils->stripSlashesScalarKeys( $_POST, self::META_BOX_SAVE_POSSIBLE_INPUTS );
 
 		if ( empty( $input[ 'spritz_post_sidebar_nonce' ] ) || !wp_verify_nonce( $input[ 'spritz_post_sidebar_nonce' ], plugin_basename( __FILE__ ) ) ) {
 			return $postId;
@@ -459,7 +484,7 @@ class App {
 	}
 
 	protected function getMessages() : array {
-		return isset( $_SESSION[ self::POST_STATE_MESSAGES ] ) ? $_SESSION[ self::POST_STATE_MESSAGES ] : [];
+		return isset( $_SESSION[ self::POST_STATE_MESSAGES ] ) ? $this->utils->stripSlashesScalarLimit( $_SESSION[ self::POST_STATE_MESSAGES ], 20, [] ) : [];
 	}
 
 	protected function setMessages( $messages = [] ) : void {
@@ -467,7 +492,7 @@ class App {
 			$_SESSION[ self::POST_STATE_MESSAGES ] = [];
 		}
 
-		$_SESSION[ self::POST_STATE_MESSAGES ] = array_merge( $_SESSION[ self::POST_STATE_MESSAGES ], $messages );
+		$_SESSION[ self::POST_STATE_MESSAGES ] = array_merge( $messages, $this->utils->stripSlashesScalarLimit( $_SESSION[ self::POST_STATE_MESSAGES ], 20, [] ) );
 	}
 
 	protected function getCheckboxValue( $key, $ary ) : bool {

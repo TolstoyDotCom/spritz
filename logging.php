@@ -1,5 +1,9 @@
 <?php
 
+if ( !defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 if ( !function_exists( 'rawdebug' ) ) {
 	function rawdebug( ...$args ) {
 		if ( WP_DEBUG ) {
@@ -9,7 +13,7 @@ if ( !function_exists( 'rawdebug' ) ) {
 				error_log( $arg );
 			}
 			else {
-				error_log( json_encode( $args ) );
+				error_log( wp_json_encode( $args ) );
 			}
 		}
 	}
